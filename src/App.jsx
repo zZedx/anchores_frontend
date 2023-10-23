@@ -20,10 +20,19 @@ const App = () => {
     fetchPosts();
   }, []);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!name && !email) return;
-    setRandomOtp(Math.floor(100000 + Math.random() * 900000));
+    const res = await fetch("http://localhost:3000/otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({email}),
+      });
+      const data = await res.json()
+      console.log(data)
+    setRandomOtp(data);
     setFormSubmit(true);
   }
 
@@ -84,7 +93,7 @@ const App = () => {
             </form>
           ) : (
             <form action="" onSubmit={handleOtpSubmit}>
-              <h1>{randomOtp}</h1>
+              {/* <h1>{randomOtp}</h1> */}
               <input
                 type="number"
                 placeholder="otp"
