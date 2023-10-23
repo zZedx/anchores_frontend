@@ -67,7 +67,7 @@ const App = () => {
         },
         body: JSON.stringify({ name, email, content }),
       });
-      setPosts((posts) => [...posts, { user: { name }, content }]);
+      setPosts((posts) => [...posts, { user: { name }, content , comments : []}]);
     }
   }
 
@@ -124,9 +124,9 @@ const App = () => {
               <h1>{post.user.name}</h1>
               <p>{post.content}</p>
               <Comments post = {post} email={email} name={name}/>
-              {/* <ul>
-                {post.comments.map((comment)=> <li key={comment}>{comment}</li>)}
-              </ul */}
+              <ul>
+                {post.comments.map((comment , i)=> <li key={i}>{comment.comment}</li>)}
+              </ul>
             </li>
           ))}
         </ul>
