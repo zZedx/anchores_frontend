@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 
+const localUrl = "http://localhost:3000"
+const url = "https://anchors-backend.onrender.com"
+
 const App = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -12,7 +15,7 @@ const App = () => {
 
   useEffect(() => {
     async function fetchPosts() {
-      const res = await fetch("http://localhost:3000/posts");
+      const res = await fetch(url+"/posts");
       const data = await res.json();
       setPosts(data);
       setContent("");
@@ -23,7 +26,7 @@ const App = () => {
   async function handleSubmit(e) {
     e.preventDefault();
     if (!name && !email) return;
-    const res = await fetch("http://localhost:3000/otp", {
+    const res = await fetch(url+"/otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -43,7 +46,7 @@ const App = () => {
     if (otp !== randomOtp) {
       return;
     } else {
-      const res = await fetch("http://localhost:3000/login", {
+      const res = await fetch(url+"/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -60,7 +63,7 @@ const App = () => {
     if (!content) {
       return;
     } else {
-      await fetch("http://localhost:3000/createPost", {
+      await fetch(url+"/createPost", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -140,7 +143,7 @@ function Comments({post , email , name}) {
 
   async function handleAddComment(e, id) {
     e.preventDefault();
-    const res = await fetch("http://localhost:3000/addComment", {
+    const res = await fetch(url+"/addComment", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
