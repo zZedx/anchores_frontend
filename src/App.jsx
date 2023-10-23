@@ -115,9 +115,9 @@ const App = () => {
               <h1>{post.user.name}</h1>
               <p>{post.content}</p>
               <Comments post = {post} email={email} name={name}/>
-              <ul>
+              {/* <ul>
                 {post.comments.map((comment)=> <li key={comment}>{comment}</li>)}
-              </ul>
+              </ul> */}
             </li>
           ))}
         </ul>
