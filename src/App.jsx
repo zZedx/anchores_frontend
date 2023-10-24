@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-const localUrl = "http://localhost:3000"
-const url = "https://anchors-backend.onrender.com"
+const localUrl = "http://localhost:3000";
+const url = "https://anchors-backend.onrender.com";
 
 const App = () => {
   const [name, setName] = useState("");
@@ -15,7 +15,7 @@ const App = () => {
 
   useEffect(() => {
     async function fetchPosts() {
-      const res = await fetch(url+"/posts");
+      const res = await fetch(url + "/posts");
       const data = await res.json();
       setPosts(data);
       setContent("");
@@ -26,27 +26,25 @@ const App = () => {
   async function handleSubmit(e) {
     e.preventDefault();
     if (!name && !email) return;
-    const res = await fetch(url+"/otp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({email}),
-      });
-      const data = await res.json()
-      console.log(data)
+    const res = await fetch(url + "/otp", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
     setRandomOtp(data);
     setFormSubmit(true);
   }
 
   async function handleOtpSubmit(e) {
     e.preventDefault();
-    console.log(typeof otp, typeof randomOtp);
     if (!otp) return;
     if (otp !== randomOtp) {
       return;
     } else {
-      const res = await fetch(url+"/login", {
+      const res = await fetch(url + "/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -63,14 +61,18 @@ const App = () => {
     if (!content) {
       return;
     } else {
-      await fetch(url+"/createPost", {
+      await fetch(url + "/createPost", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ name, email, content }),
       });
-      setPosts((posts) => [...posts, { user: { name }, content , comments : []}]);
+      setPosts((posts) => [
+        ...posts,
+        { user: { name }, content, comments: [], id: crypto.randomUUID() },
+      ]);
+      setContent("");
     }
   }
 
@@ -122,37 +124,62 @@ const App = () => {
         )}
         <h1>All posts</h1>
         <ul>
-          {posts && posts.map((post, i) => (
-            <li key={i}>
-              <h1>{post.user.name}</h1>
-              <p>{post.content}</p>
-              <Comments post = {post} email={email} name={name}/>
-              <ul>
-                {post.comments.map((comment , i)=> <li key={i}>{comment.comment}</li>)}
-              </ul>
-            </li>
-          ))}
+          {posts &&
+            posts.map((post, i) => (
+              <li key={i}>
+                <h3>Username : {post.user.name}</h3>
+                <p>{post.content}</p>
+                <Comments
+                  post={post}
+                  setPosts={setPosts}
+                  email={email}
+                  name={name}
+                />
+                <ul>
+                  {post.comments.map((comment, i) => (
+                    <li key={i}>{comment.comment}</li>
+                  ))}
+                </ul>
+              </li>
+            ))}
         </ul>
       </main>
     </div>
   );
 };
 
-function Comments({post , email , name}) {
+function Comments({ post, email, name, setPosts }) {
   const [comment, setComment] = useState("");
 
-  async function handleAddComment(e, id) {
+  async function handleAddComment(e, post) {
     e.preventDefault();
-    const res = await fetch(url+"/addComment", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name, email, id, comment }),
-    });
+    console.log(post);
+    if (post._id) {
+      const id = post._id;
+      const res = await fetch(url + "/addComment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, id, comment }),
+      });
+      setPosts((posts) =>
+        posts.filter((p) =>
+          p.id === id ? { ...p, comments: [...p.comments, comment] } : p
+        )
+      );
+    } else {
+      const id = post.id;
+      setPosts((posts) =>
+        posts.filter((p) =>
+          p.id === id ? { ...p, comments: [...p.comments, comment] } : p
+        )
+      );
+    }
+    setComment("");
   }
   return (
-    <form action="" onSubmit={(e) => handleAddComment(e, post._id)}>
+    <form action="" onSubmit={(e) => handleAddComment(e, post)}>
       <input
         type="text"
         placeholder="Add Comment"
